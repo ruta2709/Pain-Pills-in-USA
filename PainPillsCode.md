@@ -17,7 +17,9 @@
  hdfs dfs -mkdir /user/avalasa/PainPillsInTheUSA/MostPopularPainPillsInParticularStates
  hdfs dfs -ls /user/avalasa/PainPillsInTheUSA/MostPopularPainPillsInParticularStates
 
-
+hdfs dfs -mkdir /user/avalasa/PainPillsInTheUSA/PainPillsInParticularStatesbyyear
+ hdfs dfs -ls /user/avalasa/PainPillsInTheUSA/PainPillsInParticularStatesbyyear
+ 
  hdfs dfs -put arcos_all_washpost.tsv /user/avalasa/PainPillsInTheUSA/
 
  hdfs dfs -cat /user/avalasa/PainPillsInTheUSA/arcos_all_washpost.tsv
@@ -196,3 +198,25 @@ hdfs dfs -get /user/avalasa/PainPillsInTheUSA/MostPopularPainPillsInParticularSt
 readlink -f PainPills_In_The_Particular_States_FL_TX_CA.txt // to know linux system path
 
 scp avalasa@52.12.203.116:/home/avalasa/PainPills_In_The_Particular_States_FL_TX_CA.txt 
+
+
+State Pain Pills Count by year:-
+
+DROP TABLE IF EXISTS PainPills_In_Particular_States_year;
+CREATE TABLE PainPills_In_Particular_States_year
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+STORED AS TEXTFILE LOCATION '/user/avalasa/PainPillsInTheUSA/PainPillsInParticularStatesbyyear'
+AS
+select BUYER_STATE, sum(QUANTITY) AS Drug_Count, SUBSTRING(TRANSACTION_DATE, 5, 4) AS year from Pain_Pills_In_The_USA where (BUYER_STATE like "CA" or BUYER_STATE like "FL") GROUP BY BUYER_STATE, SUBSTRING(TRANSACTION_DATE, 5, 4);
+
+select * from PainPills_In_Particular_States_year ORDER BY BUYER_STATE DESC;
+
+hdfs dfs -ls /user/avalasa/PainPillsInTheUSA/PainPillsInParticularStatesbyyear
+
+hdfs dfs -cat /user/avalasa/PainPillsInTheUSA/PainPillsInParticularStatesbyyear/000004_0 | tail -n 2
+
+hdfs dfs -get /user/avalasa/PainPillsInTheUSA/PainPillsInParticularStatesbyyear/000004_0 PainPillsInParticularStatesbyyear.txt
+
+readlink -f PainPills_In_Particular_States_year.txt// to know linux system path
+
+scp avalasa@35.87.210.247:/home/avalasa/PainPillsInParticularStatesbyyear.txt .
